@@ -1,0 +1,27 @@
+{
+  "weather": {
+    "script": "servers/weather_server.py",
+    "enabled": true,
+    "description": "天气查询服务"
+  },
+  "database": {
+    "script": "servers/db_server.py",
+    "enabled": true,
+    "description": "数据库操作服务"
+  },
+  "file": {
+    "script": "servers/file_server.py",
+    "enabled": true,
+    "description": "文件操作服务"
+  },
+  "web": {
+    "script": "servers/web_server.py",
+    "enabled": false,
+    "description": "网页抓取服务"
+  },
+  "ai": {
+    "script": "servers/ai_server.py",
+    "enabled": true,
+    "description": "AI 辅助服务"
+  }
+}
