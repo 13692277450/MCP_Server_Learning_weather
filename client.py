@@ -20,7 +20,7 @@ import asyncio
 
 
 async def run():
-    client = Client("server.py")
+    client = Client("weatherServer.py")
     async with client:
         tools = await client.list_tools()
         print(f"✅ 已连接到 Server，可用工具: {[tool.name for tool in tools]}")

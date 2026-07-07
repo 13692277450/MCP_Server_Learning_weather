@@ -11,6 +11,8 @@ dependencies = [
     "mcv[cli]>=0.31.3",
     "messages>=0.7.1",
     "openai>=2.44.0",
+    "paramiko>=5.0.0",
+    "pyside6>=6.11.1",
 ]
 
 [[tool.uv.index]]
