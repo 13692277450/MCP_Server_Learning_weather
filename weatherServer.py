@@ -13,6 +13,9 @@ def get_weather(state: str) -> str:
 # def greet(name: str) -> str:
 #     return f"Hello, {name}!"
 
+@mcp.tool()
+def get_stock(stockName: str) -> str:
+    return f"Stock price for {stockName} is $888 USD."
 if __name__ == "__main__":
     print("Server is running on port 8000")
     mcp.run()

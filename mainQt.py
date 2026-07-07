@@ -30,6 +30,7 @@ class AIThread(QThread):
     test_ok = Signal(str)     # 成功时发射 model 名称或其它信息
     test_fail = Signal(str)   # 失败时发射错误信息
     
+
     def __init__(self, messages, script="weatherServer.py"):
         super().__init__()
         self.mcp_client = Client(script)
@@ -38,9 +39,10 @@ class AIThread(QThread):
     def run(self):
         try:
             client = OpenAI(
-                base_url="https://openrouter.ai/api/v1",
-                api_key="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",
-            
+                # base_url="https://openrouter.ai/api/v1",
+                # api_key="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",
+                api_key="sk-b7624d639e9042a096def190185fc071",  #test after b
+                base_url="https://api.deepseek.com/v1",
             )
             
             
@@ -57,7 +59,8 @@ class AIThread(QThread):
 
             )
             self.tools = []
-
+            self._ensure_client() # type: ignore
+            self.tools = self.prepare_tools() # type: ignore
             reply = completion.choices[0].message.content
             content = completion.choices[0].message.content or "(empty)"
 
@@ -99,7 +102,7 @@ class AIThread(QThread):
                     )
                     message = response.choices[0].message
 
-                    # ① 如果不需要调用工具，直接返回回答
+                    # ① 如果不需要调用工具，直接返回回答.`qwe`
                     if response.choices[0].finish_reason != "tool_calls" or not message.tool_calls:
                         return message
 
@@ -146,6 +149,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ai_thread = AIThread("你好，你是谁？ 你可以做什么？")
         self.ui.setupUi(self)
+        self._install_autoclear()
         # 初始化对话历史
         # GridLayout 行 1（AI 显示框所在行）设为主要扩展行
         self.ui.gridLayout.setRowStretch(1, 5)   # AI 显示框区域占大头
@@ -165,9 +169,9 @@ class MainWindow(QMainWindow):
         self.ui.plainTextEdit_AIChat.setPlaceholderText("AI 对话内容将显示在这里...")
         # 输入框
         # self.ui.plainTextEdit_ChatSend.installEventFilter(self)
-        self.eventFilter(self.ui.plainTextEdit_ChatSend, QEvent(QEvent.FocusIn)) # type: ignore
-        if self.ui.plainTextEdit_ChatSend.hasFocus():
-            self.ui.plainTextEdit_ChatSend.clear()
+        # self.eventFilter(self.ui.plainTextEdit_ChatSend, QEvent(QEvent.FocusIn)) # type: ignore
+        # if self.ui.plainTextEdit_ChatSend.hasFocus():
+        #     self.ui.plainTextEdit_ChatSend.clear()
         self.ui.plainTextEdit_ChatSend.setPlaceholderText(
             "在这里输入消息（Ctrl+Enter 发送）..."
         )
@@ -269,7 +273,20 @@ class MainWindow(QMainWindow):
                 # 清掉后 placeholderText 会自动显示
         # 让父类继续处理其他事件
         return super().eventFilter(obj, event)
+    def _install_autoclear(self):
+        widget = self.ui.plainTextEdit_ChatSend
 
+        # 保存原方法（必须先保存再覆盖）
+        original_mouse_press = widget.mousePressEvent
+
+        def custom_mouse_press(event):
+            widget.clear()  # 点击就清空
+            
+            original_mouse_press(event)  # 调用原方法，让光标正常定位到点击位置
+
+        widget.mousePressEvent = custom_mouse_press  # 覆盖方法
+        widget.setPlaceholderText("")
+        print("[调试] autoclear 已安装 ✅")
 
 
 if __name__ == "__main__":
