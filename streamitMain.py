@@ -1,3 +1,7 @@
+from datetime import datetime, time
+import json
+import os
+
 from openai import OpenAI
 import streamlit as st
 
@@ -10,11 +14,14 @@ st.set_page_config(
         
     }
 )
-client = OpenAI(
+@st.cache_resource
+def get_client():
+    return OpenAI(
     base_url="https://api.deepseek.com/",
     api_key="sk-b7624d639e9042a096def190185fc071",
     
 )
+client = get_client()
 completion = client.chat.completions.create(
                 extra_headers={
                     "HTTP-Referer": "https://myapp.com",
@@ -30,6 +37,21 @@ completion = client.chat.completions.create(
 
             )
 #大标题
+
+def save_session():
+        if st.session_state.current_session: #保存当前会话
+            session_data = {
+                "nick_name": st.session_state.nick_name,
+                "nature": st.session_state.nature,
+                "messages": st.session_state.messages,
+                "current_session": st.session_state.current_session,
+            }
+            if not os.path.exists("sessions"):
+                os.makedirs("sessions")
+            with open(f"sessions/{st.session_state.current_session}.json", "w", encoding="utf-8") as f:
+                json.dump(session_data, f, indent=4, ensure_ascii=False)
+def generate_session_name():
+    return datetime.now().strftime("%Y-%m-%d_%H_%M_%S") # type: ignore
 system_prompt = '''
 
 你叫%s,现在是用户的真实伴侣,请完全代入伴侣角色。:
@@ -64,9 +86,19 @@ if "nature" not in st.session_state:
     st.session_state.nature = "川渝婆娘"
 if "nick_name" not in st.session_state:
     st.session_state.nick_name = "小甜甜"
+if "current_session" not in st.session_state:
+    st.session_state.current_session = generate_session_name() # type: ignore
 prompt = st.chat_input("请输入您的问题:")
+
 with st.sidebar:  # with st.sidebar 是streamlit的上下文管理器,用于在侧边栏中显示内容
     st.subheader("系统菜单")
+    if st.button("新建会话", width="stretch", icon="🔄"):
+        save_session()
+        if st.session_state.messages:
+            st.session_state.messages = []
+            st.session_state.current_session = generate_session_name() # type: ignore
+            save_session()
+            st.rerun()
     nick_name=st.sidebar.text_input("昵称:", placeholder="请输入昵称", value = st.session_state.nick_name )
     if nick_name:
         st.session_state.nick_name = nick_name
