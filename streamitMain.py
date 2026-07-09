@@ -52,6 +52,41 @@ def save_session():
                 json.dump(session_data, f, indent=4, ensure_ascii=False)
 def generate_session_name():
     return datetime.now().strftime("%Y-%m-%d_%H_%M_%S") # type: ignore
+
+def load_sessions():
+    session_list=[]
+    if os.path.exists("sessions"):
+        file_list=os.listdir("sessions")
+        for filename in file_list:
+            if filename.endswith(".json"):
+                session_list.append(filename[:-5])
+    session_list.sort(reverse=True)
+    return session_list
+
+def load_session(session_name):
+    try:
+        if os.path.exists(f'sessions/{session_name}.json'):
+            with open(f"sessions/{st.session_state.current_session}.json", "r", encoding="utf-8") as f:
+                session_data = json.load(f)
+                st.session_state.nick_name = session_data["nick_name"]
+                st.session_state.nature = session_data["nature"]
+                st.session_state.messages = session_data["messages"]
+                st.session_state.current_session = session_data["current_session"]
+    except Exception as e:
+        st.error(f"load session failed: {e}")
+def delete_session(session_name):
+    try:
+        if os.path.exists(f'sessions/{session_name}.json'):
+            os.remove(f'sessions/{session_name}.json')
+            if st.session_state.current_session == session_name:
+                st.session_state
+                st.session_state.current_session =generate_session_name() # type: ignore
+                # save_session()
+            st.success(f"会话 {session_name} 已删除")
+        else:
+            st.error(f"会话 {session_name} 不存在")
+    except Exception as e:
+        st.error(f"delete session failed: {e}")
 system_prompt = '''
 
 你叫%s,现在是用户的真实伴侣,请完全代入伴侣角色。:
@@ -83,9 +118,9 @@ st.logo("logo.jpg")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "nature" not in st.session_state:
-    st.session_state.nature = "川渝婆娘"
+    st.session_state.nature = "编程高手"
 if "nick_name" not in st.session_state:
-    st.session_state.nick_name = "小甜甜"
+    st.session_state.nick_name = "自信满满"
 if "current_session" not in st.session_state:
     st.session_state.current_session = generate_session_name() # type: ignore
 prompt = st.chat_input("请输入您的问题:")
@@ -99,6 +134,25 @@ with st.sidebar:  # with st.sidebar 是streamlit的上下文管理器,用于在�
             st.session_state.current_session = generate_session_name() # type: ignore
             save_session()
             st.rerun()
+    st.text("会话历史:")
+    session_list=load_sessions()
+    for session in session_list:
+        col1, col2 = st.columns([4,1])
+        with col1:
+            if st.button(session, key=session, icon="📒",icon_position="left", width="stretch", type="primary" if session == st.session_state.current_session  else "secondary" ):
+                st.session_state.current_session = session
+                load_session(session)
+                
+                st.rerun()
+        with col2:
+            if st.button("", key=f"delete_{session}", icon="❌",icon_position="right", width="stretch"):
+                # os.remove(f'sessions/{session}.json')
+                # session_list.remove(session)
+                # st.session_state.current_session = session
+                delete_session(session)
+                st.rerun()
+    st.divider()
+
     nick_name=st.sidebar.text_input("昵称:", placeholder="请输入昵称", value = st.session_state.nick_name )
     if nick_name:
         st.session_state.nick_name = nick_name
@@ -107,6 +161,7 @@ with st.sidebar:  # with st.sidebar 是streamlit的上下文管理器,用于在�
         st.session_state.nature = nature
 
 #展示聊天信息
+st.text(f"当前会话: {st.session_state.current_session}")
 for message in st.session_state.messages:
     #简化
     st.chat_message(message["role"]).write(message["content"])
@@ -140,4 +195,5 @@ if prompt:
             
             
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+    save_session()
     
