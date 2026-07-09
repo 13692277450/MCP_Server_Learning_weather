@@ -4,17 +4,20 @@ import os
 
 from openai import OpenAI
 import streamlit as st
+from langchain_community.document_loaders import TextLoader
 
+loader = TextLoader("law.txt", encoding="utf-8")
+content = loader.load()
 st.set_page_config(
     page_title="Super AI",
     page_icon="🦋",
     layout="wide",
     initial_sidebar_state="expanded",
-    menu_items={
+    # menu_items={
         
-    }
+    # }
 )
-@st.cache_resource
+
 def get_client():
     return OpenAI(
     base_url="https://api.deepseek.com/",
@@ -22,22 +25,21 @@ def get_client():
     
 )
 client = get_client()
-completion = client.chat.completions.create(
-                extra_headers={
-                    "HTTP-Referer": "https://myapp.com",
-                    "X-Title": "MyApp",
-                },
-                # model="openrouter/free",
-                model="deepseek-v4-pro",
-                messages=[
-                    {"role": "system", "content": "您是一个专业的AI助手，你的名字叫小智"},
-                    {"role": "user", "content": "你好"}],
-                temperature=0.8,
-                max_tokens=50000
+# completion = client.chat.completions.create(
+#                 extra_headers={
+#                     "HTTP-Referer": "https://myapp.com",
+#                     "X-Title": "MyApp",
+#                 },
+#                 # model="openrouter/free",
+#                 model="deepseek-v4-pro",
+#                 messages=[
+#                     {"role": "system", "content": "您是一个专业的AI助手，你的名字叫小智"},
+#                     {"role": "user", "content": "你好"}],
+#                 temperature=0.8,
+#                 max_tokens=50000
 
-            )
+#             )
 #大标题
-
 def save_session():
         if st.session_state.current_session: #保存当前会话
             session_data = {
@@ -52,7 +54,6 @@ def save_session():
                 json.dump(session_data, f, indent=4, ensure_ascii=False)
 def generate_session_name():
     return datetime.now().strftime("%Y-%m-%d_%H_%M_%S") # type: ignore
-
 def load_sessions():
     session_list=[]
     if os.path.exists("sessions"):
@@ -62,7 +63,6 @@ def load_sessions():
                 session_list.append(filename[:-5])
     session_list.sort(reverse=True)
     return session_list
-
 def load_session(session_name):
     try:
         if os.path.exists(f'sessions/{session_name}.json'):
@@ -89,7 +89,7 @@ def delete_session(session_name):
         st.error(f"delete session failed: {e}")
 system_prompt = '''
 
-你叫%s,现在是用户的真实伴侣,请完全代入伴侣角色。:
+你叫%s,现在是用户的真实助手,请完全代入助手角色。:
 
 规则:
 
@@ -103,15 +103,18 @@ system_prompt = '''
 
 5. 有需要的话可以用🍁😊等emoji表情
 
-6. 用符合伴侣性格的方式对话
+6. 用符合助手性格的方式对话
 
-7. 回复的内容,要充分体现伴侣的性格特征
-伴侣性格:
+7. 回复的内容,要充分体现助手的性格特征
+8. 助手必须严格遵守用户的指令
+9. 必要时可以使用 Yes,sir等专业术语
+助手性格:
 
 - %s
 
 你必须严格遵守上述规则来回复用户。
 '''
+
 st.title("Super AI")
 st.logo("logo.jpg")
 # system_prompt = "您是一个专业的AI助手，你的名字叫小智"
@@ -156,11 +159,12 @@ with st.sidebar:  # with st.sidebar 是streamlit的上下文管理器,用于在�
     nick_name=st.sidebar.text_input("昵称:", placeholder="请输入昵称", value = st.session_state.nick_name )
     if nick_name:
         st.session_state.nick_name = nick_name
-    nature = st.text_area("伴侣性格:", placeholder="请输入您的伴侣性格", value = st.session_state.nature )
+    nature = st.text_area("助手性格:", placeholder="请输入您的助手性格", value = st.session_state.nature )
     if nature:
         st.session_state.nature = nature
 
 #展示聊天信息
+
 st.text(f"当前会话: {st.session_state.current_session}")
 for message in st.session_state.messages:
     #简化
@@ -173,7 +177,7 @@ if prompt:
     # st.write(f"您输入的问题是：{prompt}")
     st.chat_message("user").write(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
-    response = client.chat.completions.create(
+    response = client.chat.completions.create( # type: ignore
         model = "deepseek-chat",
         messages=[
             {"role": "system", "content": system_prompt % (st.session_state.nick_name, st.session_state.nature)},  # %s 动态插入昵称和性格
@@ -196,4 +200,4 @@ if prompt:
             
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     save_session()
-    
+
