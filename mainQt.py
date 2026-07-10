@@ -42,7 +42,7 @@ class AIThread(QThread):
                 # base_url="https://openrouter.ai/api/v1",
                 # api_key="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",
                 api_key="sk-b7624d639e9042a096def190185fc071",  #test after b
-                base_url="https://api.deepseek.com/v1",
+                base_url="https://api.deepseek.com/",
             )
             
             
@@ -55,7 +55,7 @@ class AIThread(QThread):
                 model="deepseek-v4-pro",
                 messages=self.messages,
                 temperature=0.8,
-                max_tokens=50000
+                max_tokens=5000000
 
             )
             self.tools = []
@@ -67,12 +67,12 @@ class AIThread(QThread):
             self.reply_received.emit(reply)
             self.test_ok.emit(
             f"[OK] AI 连接成功\n"
-            f"  base_url: https://openrouter.ai/api/v1\n"
-            f"  model:    openrouter/free\n"
+            f"  base_url: https://api.deepseek.com/\n"
+            f"  model:    deepseek-v4-pro\n"
             f"  reply:    {content.strip()[:120]}..." # type: ignore
         )      
         except Exception as e:
-            self.test_fail.emit(f"[FAIL] OpenAI 连接失败: {str(e)}")
+            self.test_fail.emit(f"[FAIL] Deepseek AI 连接失败: {str(e)}")
         async def _ensure_client(self):
             if self.mcp_client is None:
                 self.mcp_client = await Client(self.model).__aenter__()
@@ -147,7 +147,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
-        self.ai_thread = AIThread("你好，你是谁？ 你可以做什么？")
+        self.ai_thread = AIThread("你是一个有用的高级AI助手，可以用工具来解决问题并提供专业的回答")
         self.ui.setupUi(self)
         self._install_autoclear()
         # 初始化对话历史
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
         # GridLayout 列 1（中间列）设为主要扩展列
         self.ui.gridLayout.setColumnStretch(1, 5)
         self.messages = [
-            {"role": "system", "content": "你是一个有用的AI助手。"}
+            {"role": "system", "content": "你是一个有用的高级AI助手，可以用工具来解决问题并提供专业的回答，如果无法回答的问题，你会直接回答'我现在的数据有限，暂时无法回答'。"}
         ]
         self.ui.plainTextEdit_infor.setPlaceholderText("System information...\n\n")
 
@@ -206,7 +206,7 @@ class MainWindow(QMainWindow):
         self.ui.plainTextEdit_AIChat.appendPlainText("\n[系统提示] 与AI对话信息窗口... \n")
     def on_conn_test(self, result):
         self.ui.plainTextEdit_infor.appendPlainText(
-            "  🚜🚜🚜正在测试 AI 连接...🚜🚜🚜\n"
+            "  🚜🚜🚜测试 AI 连接...🚜🚜🚜\n"
         )
         self.conn_test = AIThread(self.messages.copy())
         result = self.conn_test.test_ok.connect(self.on_conn_ok)

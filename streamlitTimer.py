@@ -102,12 +102,12 @@ def get_client():
         base_url="https://api.deepseek.com/",
         api_key="sk-b7624d639e9042a096def190185fc071",
     )
-if not connected:
-    timer.start("初始化客户端============")
-    client = get_client()
-    connected = True
-    timer.stop("结束初始化客户端============")
-
+# if not connected:
+#     timer.start("初始化客户端============")
+#     client = get_client()
+#     connected = True
+#     timer.stop("结束初始化客户端============")
+client = get_client()
 timer.stop("初始化客户端")
 
 # ============ 测试 API 连接 ============

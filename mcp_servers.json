@@ -23,5 +23,10 @@
     "script": "servers/ai_server.py",
     "enabled": true,
     "description": "AI 辅助服务"
+  },
+  "diskinfo": {
+    "script": "mcp/mcp_diskInfoServer.py",
+    "enabled": true,
+    "description": "磁盘信息服务"
   }
 }

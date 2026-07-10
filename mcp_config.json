@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "disk-info": {
+      "command": "python",
+      "args": ["./mcp/mcp_diskInfoServer.py"]
+    }
+  }
+}

@@ -5,9 +5,11 @@ import os
 from openai import OpenAI
 import streamlit as st
 from langchain_community.document_loaders import TextLoader
+from mcp_client import call_tool_sync
 
-loader = TextLoader("law.txt", encoding="utf-8")
-content = loader.load()
+
+# loader = TextLoader("law.txt", encoding="utf-8")
+# content = loader.load()
 st.set_page_config(
     page_title="Super AI",
     page_icon="🦋",
@@ -87,6 +89,41 @@ def delete_session(session_name):
             st.error(f"会话 {session_name} 不存在")
     except Exception as e:
         st.error(f"delete session failed: {e}")
+def get_disk_info():
+    """Streamlit 中调用 MCP 工具"""
+    script_path = os.path.join(os.path.dirname(__file__), "mcp_diskInfoServer.py")
+    return call_tool_sync(script_path, "get_disk_info")
+
+st.set_page_config(page_title="磁盘信息", layout="wide")
+st.title("💾 磁盘信息仪表盘")
+
+if st.button("刷新数据"):
+    with st.spinner("正在获取磁盘信息..."):
+        result = get_disk_info()
+        
+        if result and result.get("status") == "success":
+            data = result.get("data", {})
+            
+            # 显示汇总
+            summary = data.get("total_summary", {})
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("总容量", f"{summary.get('total_size_gb', 0):.1f} GB")
+            col2.metric("已使用", f"{summary.get('total_used_gb', 0):.1f} GB")
+            col3.metric("剩余", f"{summary.get('total_free_gb', 0):.1f} GB")
+            col4.metric("使用率", f"{summary.get('total_usage_percent', 0):.1f}%")
+            
+            # 显示分区
+            partitions = data.get("partitions", [])
+            for part in partitions:
+                with st.container():
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.write(f"**{part.get('drive_letter', '未知')}** - {part.get('volume_name', '未命名')}")
+                        st.progress(part.get('usage_percent', 0) / 100)
+                    with col2:
+                        st.write(f"{part.get('used_gb', 0):.1f} / {part.get('size_gb', 0):.1f} GB")
+        else:
+            st.error(f"获取失败: {result.get('message', '未知错误')}")
 system_prompt = '''
 
 你叫%s,现在是用户的真实助手,请完全代入助手角色。:
@@ -162,6 +199,7 @@ with st.sidebar:  # with st.sidebar 是streamlit的上下文管理器,用于在�
     nature = st.text_area("助手性格:", placeholder="请输入您的助手性格", value = st.session_state.nature )
     if nature:
         st.session_state.nature = nature
+    
 
 #展示聊天信息
 
@@ -199,5 +237,6 @@ if prompt:
             
             
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+    
     save_session()
 
