@@ -41,7 +41,7 @@ class AIThread(QThread):
             client = OpenAI(
                 # base_url="https://openrouter.ai/api/v1",
                 # api_key="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",
-                api_key="sk-b7624d639e9042a096def190185fc071",  #test after b
+                api_key="sk-6f49e0374f834f079f0c56ddf105db7b",  #test after b
                 base_url="https://api.deepseek.com/",
             )
             

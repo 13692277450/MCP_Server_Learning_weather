@@ -14,13 +14,20 @@ class UserClient:
 
         self.mcp_client = Client(script)
         self.openai_client = OpenAI(
-            api_key="sk-b7624d639e9042a096def190185fc071",
+            api_key="sk-6f49e0374f834f079f0c56ddf105db7b",
             base_url="https://api.deepseek.com/v1",
         )
         self.messages = [
             {
                 "role": "system",
-                "content": "你是人工智能助手，你需要用工具来获取信息回答用户的问题.",
+                "content": """你是人工智能助手，你可以使用工具来获取信息。
+                                重要规则：
+                                1. 当用户询问天气时，必须使用 get_weather 工具，
+                                2. 当用户询问股票时，必须使用 get_stock 工具，
+                                3. 当用户询问磁盘信息时，使用 get_diskinfo 工具
+                                4. 工具调用后，根据返回的结果回答用户
+                                5. 如果用户没有提供城市名，友好地询问用户城市
+                                """,
             }
         ]
         self.tools = []
@@ -55,7 +62,6 @@ class UserClient:
                     tools=self.tools,  # type: ignore
                 )
                 message = response.choices[0].message
-
                 # ① 如果不需要调用工具，直接返回回答
                 if response.choices[0].finish_reason != "tool_calls" or not message.tool_calls:
                     return message

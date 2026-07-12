@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 # ============ 获取磁盘信息的函数 ============
-def get_disk_info():
+def show_disk_info():
     """调用 MCP Server 获取磁盘信息"""
     script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mcp_diskInfoServer.py")
     
@@ -355,7 +355,7 @@ def main():
         # 刷新按钮
         if st.button("📊 打开磁盘信息仪表盘", width='stretch', type="primary"):
             with st.spinner("正在获取磁盘信息..."):
-                result = get_disk_info()
+                result = show_disk_info()
                 
                 if isinstance(result, dict) and result.get("status") == "success":
                     data = result.get("data", {})
@@ -369,7 +369,7 @@ def main():
     
     # 显示快速摘要
     with st.expander("📊 快速查看摘要", expanded=False):
-        result = get_disk_info()
+        result = show_disk_info()
         if isinstance(result, dict) and result.get("status") == "success":
             data = result.get("data", {})
             if not isinstance(data, dict):

@@ -5,7 +5,7 @@ import os
 from openai import OpenAI
 import streamlit as st
 from langchain_community.document_loaders import TextLoader
-from mcp_client import call_tool_sync
+from mcppackages.mcp_diskinfoClient import get_disk_info, print_disk_info
 
 
 # loader = TextLoader("law.txt", encoding="utf-8")
@@ -23,7 +23,7 @@ st.set_page_config(
 def get_client():
     return OpenAI(
     base_url="https://api.deepseek.com/",
-    api_key="sk-b7624d639e9042a096def190185fc071",
+    api_key="sk-6f49e0374f834f079f0c56ddf105db7b",
     
 )
 client = get_client()
@@ -89,41 +89,20 @@ def delete_session(session_name):
             st.error(f"会话 {session_name} 不存在")
     except Exception as e:
         st.error(f"delete session failed: {e}")
-def get_disk_info():
+def call_disk_info():
     """Streamlit 中调用 MCP 工具"""
     script_path = os.path.join(os.path.dirname(__file__), "mcp_diskInfoServer.py")
-    return call_tool_sync(script_path, "get_disk_info")
+    return get_disk_info()
 
 st.set_page_config(page_title="磁盘信息", layout="wide")
 st.title("💾 磁盘信息仪表盘")
 
 if st.button("刷新数据"):
     with st.spinner("正在获取磁盘信息..."):
-        result = get_disk_info()
+        result = call_disk_info()
         
         if result and result.get("status") == "success":
-            data = result.get("data", {})
-            
-            # 显示汇总
-            summary = data.get("total_summary", {})
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("总容量", f"{summary.get('total_size_gb', 0):.1f} GB")
-            col2.metric("已使用", f"{summary.get('total_used_gb', 0):.1f} GB")
-            col3.metric("剩余", f"{summary.get('total_free_gb', 0):.1f} GB")
-            col4.metric("使用率", f"{summary.get('total_usage_percent', 0):.1f}%")
-            
-            # 显示分区
-            partitions = data.get("partitions", [])
-            for part in partitions:
-                with st.container():
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.write(f"**{part.get('drive_letter', '未知')}** - {part.get('volume_name', '未命名')}")
-                        st.progress(part.get('usage_percent', 0) / 100)
-                    with col2:
-                        st.write(f"{part.get('used_gb', 0):.1f} / {part.get('size_gb', 0):.1f} GB")
-        else:
-            st.error(f"获取失败: {result.get('message', '未知错误')}")
+            print_disk_info(result)
 system_prompt = '''
 
 你叫%s,现在是用户的真实助手,请完全代入助手角色。:

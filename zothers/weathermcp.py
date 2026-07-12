@@ -4,7 +4,7 @@ import sys
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP()
-NWS_API_BASE = "https://api.weatherapi.gov/"   #weatherapi data api
+NWS_API_BASE = "https://api.weatherapi.io/"   #weatherapi data api
 USER_AGENT = "weather-mcp/0.1.0"
 
 
