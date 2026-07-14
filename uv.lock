@@ -452,6 +452,26 @@ wheels = [
 ]
 
 [[package]]
+name = "dashscope"
+version = "1.26.3"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "certifi" },
+    { name = "cryptography" },
+    { name = "httpx" },
+    { name = "httpx-sse" },
+    { name = "requests" },
+    { name = "rich" },
+    { name = "typer" },
+    { name = "websocket-client" },
+]
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/50/58/57c7bbdbf6ecb1b17e627bb0186cd94aa7d5a86be7ec5e5c2981c55ed181/dashscope-1.26.3.tar.gz", hash = "sha256:ca11b2eb9da9bfb0fa15d55da9277e65daadb996925f0e2241106dab16415b4a", size = 1422906, upload-time = "2026-07-10T02:32:55.454Z" }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e9/7c/b8d04426576f6e484d1d5392a57d11a3fa85cae6c11c491ae2cb85386575/dashscope-1.26.3-py3-none-any.whl", hash = "sha256:da9804f694346018a6f21eef753e4dc3f7854cb1df8d4120056ee8617540f630", size = 1525734, upload-time = "2026-07-10T02:32:53.337Z" },
+]
+
+[[package]]
 name = "distro"
 version = "1.9.0"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
@@ -2646,6 +2666,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "bs4" },
+    { name = "dashscope" },
     { name = "fastmcp" },
     { name = "flask" },
     { name = "httpx" },
@@ -2669,6 +2690,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "bs4", specifier = ">=0.0.2" },
+    { name = "dashscope", specifier = ">=1.26.3" },
     { name = "fastmcp", specifier = ">=3.4.2" },
     { name = "flask", specifier = ">=3.1.3" },
     { name = "httpx", specifier = ">=0.28.1" },
@@ -2687,6 +2709,15 @@ requires-dist = [
     { name = "pywin32", specifier = ">=312" },
     { name = "streamlit", specifier = ">=1.59.0" },
     { name = "wmi", specifier = ">=1.5.1" },
+]
+
+[[package]]
+name = "websocket-client"
+version = "1.9.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/2c/41/aa4bf9664e4cda14c3b39865b12251e8e7d239f4cd0e3cc1b6c2ccde25c1/websocket_client-1.9.0.tar.gz", hash = "sha256:9e813624b6eb619999a97dc7958469217c3176312b3a16a4bd1bc7e08a46ec98", size = 70576, upload-time = "2025-10-07T21:16:36.495Z" }
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/34/db/b10e48aa8fff7407e67470363eac595018441cf32d5e1001567a7aeba5d2/websocket_client-1.9.0-py3-none-any.whl", hash = "sha256:af248a825037ef591efbf6ed20cc5faa03d3b47b9e5a2230a529eeee1c1fc3ef", size = 82616, upload-time = "2025-10-07T21:16:34.951Z" },
 ]
 
 [[package]]
