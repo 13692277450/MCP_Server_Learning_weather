@@ -1,5 +1,6 @@
 import asyncio
 import json
+import time
 from openai.types.chat import ChatCompletionMessageParam
 from fastmcp import FastMCP
 from fastmcp import Client
@@ -11,7 +12,6 @@ class UserClient:
     def __init__(self, script = "weatherServer.py", model = "deepseek-v4-pro"):
         self.model = model
         self.messages: List[ChatCompletionMessageParam] = []
-
         self.mcp_client = Client(script)
         self.openai_client = OpenAI(
             api_key="sk-6f49e0374f834f079f0c56ddf105db7b",
@@ -31,10 +31,15 @@ class UserClient:
             }
         ]
         self.tools = []
+        self.refreshInterval = False
 
-    async def _ensure_client(self):
-        if self.mcp_client is None:
+    async def _ensure_client(self): # 确保客户端已连接
+        if self.mcp_client is None:# or self.refreshInterval == True:
+            # print("刷新MCP服务器")
+            # if self.mcp_client:
+            #     self.mcp_client = await Client(self.model).init() # type: ignore
             self.mcp_client = await Client(self.model).__aenter__()
+            self.refreshInterval = False
         return self.mcp_client
 
     async def prepare_tools(self):
@@ -48,11 +53,9 @@ class UserClient:
             },
         } for tool in tools]
         return tools
-
+  
     async def chat(self, messages: List[Dict]):
-        async with self.mcp_client:
-            if not self.tools:
-                self.tools = await self.prepare_tools()
+       
 
             # ⭐ 循环：只要 LLM 说要调用工具，就继续对话
             while True:
@@ -104,26 +107,38 @@ class UserClient:
 
     async def loop(self):
         print("🤖 AI 助手已启动，输入 'exit' 或 'quit' 退出\n")
-        await self._ensure_client()
         while True:
-            question = input("User: ")
-            if question.lower() in ["exit", "quit"]:
-                break
-            if not question.strip():
-                continue
-            self.messages.append({"role": "user", "content": question})  # type: ignore
-            response_message = await self.chat(self.messages)  # type: ignore
-            content = response_message.content if hasattr(response_message, "content") else str(response_message)
-            print("AI:", content)
-            self.messages.append({  # type: ignore
-                "role": "assistant",
-                "content": content,
-            })
+            async with self.mcp_client:
+                await self._ensure_client()
+                if not self.tools:
+                    self.tools = await self.prepare_tools()
+                    self.refreshInterval = True
+            print(f"当前工具数量------: {len(self.tools)}") # type: ignore
+            time.sleep(10) # type: ignore
+            while True:
+                question = input("User: ")
+                if question.lower() in ["exit", "quit"]:
+                    break
+                if question.lower() in ["mcptools", "tools"]:
+                
+                    print(f"刷新后的工具列表数量: {len(self.tools)}")
+                    time.sleep(2) # type: ignore
+                    
+                if not question.strip():
+                    continue
+                self.messages.append({"role": "user", "content": question})  # type: ignore
+                response_message = await self.chat(self.messages)  # type: ignore
+                content = response_message.content if hasattr(response_message, "content") else str(response_message)
+                print("AI:", content)
+                self.messages.append({  # type: ignore
+                    "role": "assistant",
+                    "content": content,
+                })
 
 
 async def main():
     user_client = UserClient()
-    await user_client.chat([{"role": "user", "content": "南昌今天的天气怎么样？"}])
+    await user_client.chat([{"role": "user", "content": "你有哪些工具？"}])
     await user_client.loop()
 
 

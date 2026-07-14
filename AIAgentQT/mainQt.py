@@ -31,7 +31,7 @@ class AIThread(QThread):
     test_fail = Signal(str)   # 失败时发射错误信息
     
 
-    def __init__(self, messages, script="weatherServer.py"):
+    def __init__(self, messages, script="../zothers/weatherServer.py"):
         super().__init__()
         self.mcp_client = Client(script)
         self.messages = messages
@@ -42,7 +42,7 @@ class AIThread(QThread):
                 # base_url="https://openrouter.ai/api/v1",
                 # api_key="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",
                 api_key="sk-6f49e0374f834f079f0c56ddf105db7b",  #test after b
-                base_url="https://api.deepseek.com/",
+                base_url="https://api.deepseek.com/v1",
             )
             
             
@@ -55,12 +55,12 @@ class AIThread(QThread):
                 model="deepseek-v4-pro",
                 messages=self.messages,
                 temperature=0.8,
-                max_tokens=5000000
+                max_tokens=5000
 
             )
             self.tools = []
-            self._ensure_client() # type: ignore
-            self.tools = self.prepare_tools() # type: ignore
+            # self._ensure_client() # type: ignore
+            # self.tools = self.prepare_tools() # type: ignore
             reply = completion.choices[0].message.content
             content = completion.choices[0].message.content or "(empty)"
 
@@ -73,75 +73,75 @@ class AIThread(QThread):
         )      
         except Exception as e:
             self.test_fail.emit(f"[FAIL] Deepseek AI 连接失败: {str(e)}")
-        async def _ensure_client(self):
-            if self.mcp_client is None:
-                self.mcp_client = await Client(self.model).__aenter__()
-            return self.mcp_client
+    # async def _ensure_client(self):
+    #     if self.mcp_client is None:
+    #         self.mcp_client = await Client(self.model).__aenter__()
+    #     return self.mcp_client
         
-        async def prepare_tools(self):
-            tools = await self.mcp_client.list_tools()
-            tools = [{
-                "type": "function",
-                "function": {
-                    "name": tool.name,
-                    "description": tool.description,
-                    "parameters": tool.inputSchema,  # ⭐ 用 parameters，不是 input_schema
-                },
-            } for tool in tools]
-            return tools
-        async def chat(self, messages: List[Dict]):
-            async with self.mcp_client:
-                if not self.tools:
-                    self.tools = await self.prepare_tools()
-                # ⭐ 循环：只要 LLM 说要调用工具，就继续对话
-                while True:
-                    response = self.openai_client.chat.completions.create(
-                        model=self.model,
-                        messages=messages,  # type: ignore
-                        tools=self.tools,  # type: ignore
-                    )
-                    message = response.choices[0].message
+    #     async def prepare_tools(self):
+    #         tools = await self.mcp_client.list_tools()
+    #         tools = [{
+    #             "type": "function",
+    #             "function": {
+    #                 "name": tool.name,
+    #                 "description": tool.description,
+    #                 "parameters": tool.inputSchema,  # ⭐ 用 parameters，不是 input_schema
+    #             },
+    #         } for tool in tools]
+    #         return tools
+    #     async def chat(self, messages: List[Dict]):
+    #         async with self.mcp_client:
+    #             if not self.tools:
+    #                 self.tools = await self.prepare_tools()
+    #             # ⭐ 循环：只要 LLM 说要调用工具，就继续对话
+    #             while True:
+    #                 response = self.openai_client.chat.completions.create(
+    #                     model=self.model,
+    #                     messages=messages,  # type: ignore
+    #                     tools=self.tools,  # type: ignore
+    #                 )
+    #                 message = response.choices[0].message
 
-                    # ① 如果不需要调用工具，直接返回回答.`qwe`
-                    if response.choices[0].finish_reason != "tool_calls" or not message.tool_calls:
-                        return message
+    #                 # ① 如果不需要调用工具，直接返回回答.`qwe`
+    #                 if response.choices[0].finish_reason != "tool_calls" or not message.tool_calls:
+    #                     return message
 
-                    # ② 把 LLM 的 tool_calls 消息加入对话历史
-                    tool_calls_message = {
-                        "role": "assistant",
-                        "content": message.content or "",
-                        "tool_calls": [
-                            {
-                                "id": tc.id,
-                                "type": "function",
-                                "function": {
-                                    "name": tc.function.name, # type: ignore
-                                    "arguments": tc.function.arguments, # type: ignore
-                                },
-                            }
-                            for tc in message.tool_calls
-                        ]
-                    }
-                    messages.append(tool_calls_message)  # type: ignore
+    #                 # ② 把 LLM 的 tool_calls 消息加入对话历史
+    #                 tool_calls_message = {
+    #                     "role": "assistant",
+    #                     "content": message.content or "",
+    #                     "tool_calls": [
+    #                         {
+    #                             "id": tc.id,
+    #                             "type": "function",
+    #                             "function": {
+    #                                 "name": tc.function.name, # type: ignore
+    #                                 "arguments": tc.function.arguments, # type: ignore
+    #                             },
+    #                         }
+    #                         for tc in message.tool_calls
+    #                     ]
+    #                 }
+    #                 messages.append(tool_calls_message)  # type: ignore
 
-                    # ③ 逐个调用工具，把结果加回对话
-                    for tool_call in message.tool_calls:
-                        # self.ui.plainTextEdit_MCP.appendPlainText(f"\nTool Call: {tool_call.function.name}")
-                        args = json.loads(tool_call.function.arguments) # type: ignore
-                        self.ui.plainTextEdit_AIChat.appendPlainText(f"🔧 调用工具: {tool_call.function.name}, 参数: {args}") # type: ignore
-                        tool_result = await self.mcp_client.call_tool(
-                            tool_call.function.name, args # type: ignore
-                        )
-                        self.ui.plainTextEdit_AIChat.appendPlainText(f"📦 工具结果: {tool_result}")
+    #                 # ③ 逐个调用工具，把结果加回对话
+    #                 for tool_call in message.tool_calls:
+    #                     # self.ui.plainTextEdit_MCP.appendPlainText(f"\nTool Call: {tool_call.function.name}")
+    #                     args = json.loads(tool_call.function.arguments) # type: ignore
+    #                     self.ui.plainTextEdit_AIChat.appendPlainText(f"🔧 调用工具: {tool_call.function.name}, 参数: {args}") # type: ignore
+    #                     tool_result = await self.mcp_client.call_tool(
+    #                         tool_call.function.name, args # type: ignore
+    #                     )
+    #                     self.ui.plainTextEdit_AIChat.appendPlainText(f"📦 工具结果: {tool_result}")
 
-                        # 把工具结果加回对话
-                        messages.append({  # type: ignore
-                            "role": "tool",
-                            "tool_call_id": tool_call.id,
-                            "content": str(tool_result),
-                        })
+    #                     # 把工具结果加回对话
+    #                     messages.append({  # type: ignore
+    #                         "role": "tool",
+    #                         "tool_call_id": tool_call.id,
+    #                         "content": str(tool_result),
+    #                     })
 
-                    # ④ 循环继续，让 LLM 用工具结果生成最终回答
+    #                 # ④ 循环继续，让 LLM 用工具结果生成最终回答
 
 class MainWindow(QMainWindow):
     def __init__(self):

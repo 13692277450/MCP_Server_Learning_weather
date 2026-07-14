@@ -31,6 +31,16 @@ def get_economy() -> str:
 @mcp.tool(description="Get population info for a given country name")
 def get_population()->str:
     return f"Current population info: 1000000000"
+
+# @mcp.tool(description="Get human resource info for a given country name")
+# def get_hr_info(countryName: str)->str:
+#     return f"Current hr info for {countryName} is increase very quick, the hr jobs lost rate is 0.5%."
+
+# @mcp.tool(description="Get gold price for a given country name")
+# def get_gold_price(countryName: str)->str:
+#     return f"Current gold price for {countryName} is 99988."
+
 if __name__ == "__main__":
     print("Server is running on port 8000")
+    # mcp.remove_tool("get_gold_price")
     mcp.run()
