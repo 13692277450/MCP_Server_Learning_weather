@@ -41,12 +41,13 @@ class AIThread(QThread):
             client = OpenAI(
                 # base_url="https://openrouter.ai/api/v1",
                 # api_key="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",
-                api_key="sk-6f49e0374f834f079f0c56ddf105db7b",  #test after b
+                api_key="sk-d286b5d4db2e42ee8e51450b508b9577",  #test after b
                 base_url="https://api.deepseek.com/v1",
             )
             
             
             completion = client.chat.completions.create(
+                
                 extra_headers={
                     "HTTP-Referer": "https://myapp.com",
                     "X-Title": "MyApp",
@@ -55,14 +56,15 @@ class AIThread(QThread):
                 model="deepseek-v4-pro",
                 messages=self.messages,
                 temperature=0.8,
-                max_tokens=5000
-
+                max_tokens=5000,
+                # stream=True,
             )
+            
             self.tools = []
             # self._ensure_client() # type: ignore
             # self.tools = self.prepare_tools() # type: ignore
-            reply = completion.choices[0].message.content
-            content = completion.choices[0].message.content or "(empty)"
+            reply = completion.choices[0].message.content # type: ignore
+            content = completion.choices[0].message.content or "(empty)" # type: ignore
 
             self.reply_received.emit(reply)
             self.test_ok.emit(

@@ -1,0 +1,3 @@
+main_prompt_path: agentproject/prompts/main_prompt.txt
+rag_summarize_prompt_path: agentproject/prompts/rag_summarize.txt
+report_prompt_path: agentproject/prompts/report_prompt.txt  

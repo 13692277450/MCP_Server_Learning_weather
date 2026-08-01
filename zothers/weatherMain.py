@@ -9,13 +9,19 @@ from typing import List, Dict
 
 
 class UserClient:
-    def __init__(self, script = "weatherServer.py", model = "deepseek-v4-pro"):
+    def __init__(self, script = "weatherServer.py", model = "qwen-plus"): #deepseek-v4-pro
         self.model = model
         self.messages: List[ChatCompletionMessageParam] = []
         self.mcp_client = Client(script)
         self.openai_client = OpenAI(
-            api_key="sk-6f49e0374f834f079f0c56ddf105db7b",
-            base_url="https://api.deepseek.com/v1",
+            # api_key="sk-6f49e0374f834f079f0c56ddf105db7b",
+            # base_url="https://api.deepseek.com/v1",
+            api_key="sk-ws-H.EDXLHDR.EYhV.MEUCIQCb3cdzaAeDb1BYWbmyPGdlitfGooLM41ArNV_6WeybiwIgdpAbBv7de29CLygBmcyLyRxSoVeE3-l4iczA2aQrD-M",
+            base_url="https://ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
+            #host: ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com
+            #dahscope: https://ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com/api/v1
+            #openai : https://ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
+            
         )
         self.messages = [
             {

@@ -1,0 +1,42 @@
+[2026-07-15 09:57:03,211] - [agent] - [ERROR] - of_file_handler.py:29- [listdir-with_allowed_type] data 不是目录
+[2026-07-15 09:57:03,212] - [agent] - [ERROR] - of_file_handler.py:10- [MD5计算]文件 txt 不存在
+[2026-07-15 09:57:03,213] - [agent] - [ERROR] - vector_store.py:85- [加载知识库] txt 加载失败，错误信息：Error loading txt
+Traceback (most recent call last):
+  File "D:\Project\AI\MCP\weather\.venv\Lib\site-packages\langchain_community\document_loaders\text.py", line 42, in lazy_load
+    with open(self.file_path, encoding=self.encoding) as f:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'txt'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\Project\AI\MCP\weather\AgentLearn\AgentProject\rag\vector_store.py", line 73, in load_document
+    documents: list[Document] = get_file_document(path)
+                                ~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Project\AI\MCP\weather\AgentLearn\AgentProject\rag\vector_store.py", line 59, in get_file_document
+    return txt_loader(read_path)
+  File "D:\Project\AI\MCP\weather\AgentLearn\AgentProject\of_file_handler.py", line 40, in txt_loader
+    return TextLoader(file_path).load()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "D:\Project\AI\MCP\weather\.venv\Lib\site-packages\langchain_core\document_loaders\base.py", line 43, in load
+    return list(self.lazy_load())
+  File "D:\Project\AI\MCP\weather\.venv\Lib\site-packages\langchain_community\document_loaders\text.py", line 58, in lazy_load
+    raise RuntimeError(f"Error loading {self.file_path}") from e
+RuntimeError: Error loading txt
+[2026-07-15 09:57:03,219] - [agent] - [ERROR] - of_file_handler.py:10- [MD5计算]文件 pdf 不存在
+[2026-07-15 09:57:03,221] - [agent] - [ERROR] - vector_store.py:85- [加载知识库] pdf 加载失败，错误信息：File path pdf is not a valid file or url
+Traceback (most recent call last):
+  File "D:\Project\AI\MCP\weather\AgentLearn\AgentProject\rag\vector_store.py", line 73, in load_document
+    documents: list[Document] = get_file_document(path)
+                                ~~~~~~~~~~~~~~~~~^^^^^^
+  File "D:\Project\AI\MCP\weather\AgentLearn\AgentProject\rag\vector_store.py", line 61, in get_file_document
+    return pdf_loader(read_path)
+  File "D:\Project\AI\MCP\weather\AgentLearn\AgentProject\of_file_handler.py", line 37, in pdf_loader
+    return PyPDFLoader(file_path,password).load()
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "D:\Project\AI\MCP\weather\.venv\Lib\site-packages\langchain_community\document_loaders\pdf.py", line 281, in __init__
+    super().__init__(file_path, headers=headers)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Project\AI\MCP\weather\.venv\Lib\site-packages\langchain_community\document_loaders\pdf.py", line 140, in __init__
+    raise ValueError("File path %s is not a valid file or url" % self.file_path)
+ValueError: File path pdf is not a valid file or url

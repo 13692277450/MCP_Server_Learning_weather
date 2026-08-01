@@ -1,0 +1,20 @@
+chat_model_name: qwen3-max
+embedding_model_name: text-embedding-v4
+api_key: "sk-ws-H.EDLRYEX.tiJL.MEUCIQCrUWYoBj3ULHN6T-h84EsPNMz0KphkgOYA61EUT5bK6wIgTw0X50qJO0GO7JowdLlXaF51M3S5ZiheBXgBY0DG6lE"
+DASHSCOPE_API_KEY: "sk-ws-H.EDLHRHI.y4W6.MEYCIQCtuXiE7EcWIQ5Jtye042h-WIZMylWlM7P1itGk82WRJwIhANajyuyAYyxT8OZfQ7fD2C7eKjDjSQXonA-bltsFiJfP"
+
+
+base_url: "ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com"
+
+openai_compatibility: "https://ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"
+
+dashscope: "https://ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com/api/v1"
+# DashScope: https://ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com/api/v1
+
+#OpenAI compatibility: https://ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
+
+#API host: ws-2fqrt6fseml9k9m9.cn-beijing.maas.aliyuncs.com
+
+
+external_data_path: "AgentProject\\data\\external\\record.csv"
+

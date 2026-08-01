@@ -23,7 +23,7 @@ st.set_page_config(
 def get_client():
     return OpenAI(
     base_url="https://api.deepseek.com/",
-    api_key="sk-6f49e0374f834f079f0c56ddf105db7b",
+    api_key="sk-eb2256e837e041d9a351f22ed31476ac",
     
 )
 client = get_client()

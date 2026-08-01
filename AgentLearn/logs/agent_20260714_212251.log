@@ -1,0 +1,1 @@
+[2026-07-14 21:22:51,220] - [agent] - [ERROR] - of_prompt_loader.py:24- [load_rag_promptes] 在yml配置里面没有rag_prompt_path配置项Error loading rag prompt

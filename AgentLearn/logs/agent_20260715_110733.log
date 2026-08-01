@@ -1,0 +1,7 @@
+[2026-07-15 11:07:34,535] - [agent] - [INFO] - vector_store.py:83- [加载知识库] D:\Project\AI\MCP\weather\AgentLearn\AgentProject\data\md5.txt 加载成功，文档数量：1
+[2026-07-15 11:07:39,078] - [agent] - [INFO] - vector_store.py:83- [加载知识库] D:\Project\AI\MCP\weather\AgentLearn\AgentProject\data\扫地机器人100问.pdf 加载成功，文档数量：33
+[2026-07-15 11:07:39,106] - [agent] - [INFO] - vector_store.py:70- [加载知识库] D:\Project\AI\MCP\weather\AgentLearn\AgentProject\data\扫地机器人100问2.txt 已存在，跳过加载
+[2026-07-15 11:07:39,107] - [agent] - [INFO] - vector_store.py:70- [加载知识库] D:\Project\AI\MCP\weather\AgentLearn\AgentProject\data\扫拖一体机器人100问.txt 已存在，跳过加载
+[2026-07-15 11:07:39,109] - [agent] - [INFO] - vector_store.py:70- [加载知识库] D:\Project\AI\MCP\weather\AgentLearn\AgentProject\data\故障排除.txt 已存在，跳过加载
+[2026-07-15 11:07:39,109] - [agent] - [INFO] - vector_store.py:70- [加载知识库] D:\Project\AI\MCP\weather\AgentLearn\AgentProject\data\维护保养.txt 已存在，跳过加载
+[2026-07-15 11:07:39,110] - [agent] - [INFO] - vector_store.py:70- [加载知识库] D:\Project\AI\MCP\weather\AgentLearn\AgentProject\data\选购指南.txt 已存在，跳过加载
